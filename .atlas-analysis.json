@@ -1,0 +1,91 @@
+{
+  "projectType": "general",
+  "projectName": "Expresiones Language Compiler",
+  "projectDescription": "An ANTLR4-based compiler and interpreter for a simple programming language with arithmetic operations, conditional statements, and symbol table management.",
+  "theme": "aspen",
+  "primaryColor": "#6B46C1",
+  "lightColor": "#9333EA",
+  "darkColor": "#4C1D95",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "installation",
+              "quickstart"
+            ]
+          },
+          {
+            "group": "Language Reference",
+            "pages": [
+              "language/syntax",
+              "language/data-types",
+              "language/expressions",
+              "language/control-flow",
+              "language/operators"
+            ]
+          },
+          {
+            "group": "Examples",
+            "pages": [
+              "examples/basic-arithmetic",
+              "examples/conditionals",
+              "examples/complex-programs"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Architecture",
+        "groups": [
+          {
+            "group": "Components",
+            "pages": [
+              "architecture/overview",
+              "architecture/lexer",
+              "architecture/parser",
+              "architecture/visitor",
+              "architecture/symbol-table"
+            ]
+          },
+          {
+            "group": "Development",
+            "pages": [
+              "development/grammar",
+              "development/extending",
+              "development/testing"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "ANTLR4 grammar-based lexical and syntax analysis",
+    "Support for arithmetic expressions with operator precedence",
+    "Conditional control flow (if-else statements)",
+    "Variable declarations with type checking (int, float, bool)",
+    "Symbol table management for semantic analysis",
+    "Visitor pattern implementation for AST traversal",
+    "Relational and logical operators",
+    "Interactive file selection GUI"
+  ],
+  "publicApiSurface": [
+    "ExpresionesLexer - Tokenizes input source code",
+    "ExpresionesParser - Parses tokens into AST",
+    "ExpresionesVisitor - Base visitor interface for AST traversal",
+    "Visitor - Custom visitor implementation with semantic analysis",
+    "Simbolo - Symbol table entry class",
+    "visitProg() - Program entry point visitor method",
+    "visitInstrDecl() - Variable declaration visitor",
+    "visitInstrAsig() - Assignment statement visitor",
+    "visitInstrIf() - Conditional statement visitor",
+    "visitAritmetica() - Arithmetic expression evaluator",
+    "visitRelacional() - Relational expression evaluator",
+    "visitLogica() - Logical expression evaluator"
+  ]
+}
