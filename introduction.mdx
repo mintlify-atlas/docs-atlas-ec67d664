@@ -1,0 +1,102 @@
+---
+title: Introduction
+description: An ANTLR4-based compiler and interpreter for a simple programming language with arithmetic operations, conditional statements, and symbol table management.
+---
+
+<img
+  className="block dark:hidden"
+  src="/images/hero-light.svg"
+  alt="Expresiones Language Compiler"
+/>
+<img
+  className="hidden dark:block"
+  src="/images/hero-dark.svg"
+  alt="Expresiones Language Compiler"
+/>
+
+## Welcome to Expresiones
+
+Expresiones is a complete compiler and interpreter implementation built with ANTLR4, designed to demonstrate fundamental compiler construction principles including lexical analysis, syntax parsing, semantic analysis, and expression evaluation.
+
+The language supports variable declarations with type checking, arithmetic expressions with proper operator precedence, conditional control flow, and comprehensive logical operations.
+
+## Key Features
+
+<CardGroup cols={2}>
+  <Card title="ANTLR4 Grammar" icon="code" iconType="duotone">
+    Complete grammar definition with lexical and syntactic rules for robust language parsing
+  </Card>
+  <Card title="Type System" icon="list-check" iconType="duotone">
+    Support for int, float, and bool types with compile-time type checking
+  </Card>
+  <Card title="Expression Evaluation" icon="calculator" iconType="duotone">
+    Arithmetic expressions with correct operator precedence and parentheses support
+  </Card>
+  <Card title="Control Flow" icon="code-branch" iconType="duotone">
+    Conditional statements (if-else) with relational and logical operators
+  </Card>
+  <Card title="Symbol Table" icon="table" iconType="duotone">
+    Complete symbol table management for tracking variable declarations and values
+  </Card>
+  <Card title="Visitor Pattern" icon="diagram-project" iconType="duotone">
+    Clean implementation of the visitor pattern for AST traversal and semantic analysis
+  </Card>
+</CardGroup>
+
+## Quick Example
+
+Here's a simple program written in the Expresiones language:
+
+```text example.txt
+program {
+    int x = 10;
+    int y = 5;
+    int resultado = 0;
+    
+    // Arithmetic with precedence
+    resultado = x + y * 2;
+    
+    // Conditional logic
+    if (resultado > 15) {
+        x = x + 100;
+    } else {
+        x = 0;
+    }
+}
+```
+
+## How It Works
+
+The compiler processes source code through several stages:
+
+<Steps>
+  <Step title="Lexical Analysis">
+    The **ExpresionesLexer** tokenizes the input source code into a stream of tokens based on the grammar rules.
+  </Step>
+  <Step title="Syntax Parsing">
+    The **ExpresionesParser** analyzes the token stream and builds an Abstract Syntax Tree (AST) according to the grammar's syntactic rules.
+  </Step>
+  <Step title="Semantic Analysis">
+    The **Visitor** traverses the AST, performing type checking, variable scope validation, and building the symbol table.
+  </Step>
+  <Step title="Execution">
+    The visitor evaluates expressions and executes statements, producing output and maintaining program state.
+  </Step>
+</Steps>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Installation" icon="download" href="/installation">
+    Set up ANTLR4 and Python dependencies to run the compiler
+  </Card>
+  <Card title="Quick Start" icon="rocket" href="/quickstart">
+    Write and execute your first Expresiones program
+  </Card>
+  <Card title="Language Reference" icon="book" href="/language/syntax">
+    Learn the complete syntax and semantics of the language
+  </Card>
+  <Card title="Architecture" icon="sitemap" href="/architecture/overview">
+    Understand the compiler's internal architecture and design
+  </Card>
+</CardGroup>

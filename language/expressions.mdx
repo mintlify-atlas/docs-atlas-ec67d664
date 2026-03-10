@@ -1,0 +1,263 @@
+---
+title: 'Expressions'
+description: 'Understand how to write and evaluate expressions in Expresiones'
+---
+
+## Overview
+
+Expressions in Expresiones are combinations of values, variables, operators, and parentheses that evaluate to a single value.
+
+## Expression Types
+
+### Numeric Literals
+
+Direct numeric values:
+
+```expresiones
+10          // Integer literal
+42          // Integer literal
+3.14        // Float literal
+0.5         // Float literal
+```
+
+### Variable References
+
+Use variable names to reference their values:
+
+```expresiones
+int x = 10;
+int y = x;           // y gets the value of x
+int z = x + y;       // Use variables in expressions
+```
+
+## Arithmetic Expressions
+
+Expresiones supports four basic arithmetic operations:
+
+<CardGroup cols={2}>
+  <Card title="Addition (+)" icon="plus">
+    Adds two values
+  </Card>
+  <Card title="Subtraction (-)" icon="minus">
+    Subtracts the second value from the first
+  </Card>
+  <Card title="Multiplication (*)" icon="xmark">
+    Multiplies two values
+  </Card>
+  <Card title="Division (/)" icon="divide">
+    Divides the first value by the second
+  </Card>
+</CardGroup>
+
+### Basic Arithmetic
+
+```expresiones
+program {
+    int x = 10;
+    int y = 5;
+    
+    int suma = x + y;          // 15
+    int resta = x - y;         // 5
+    int producto = x * y;      // 50
+    int division = x / y;      // 2
+}
+```
+
+## Operator Precedence
+
+Expresiones follows standard mathematical operator precedence:
+
+<Steps>
+  <Step title="Parentheses">
+    Expressions inside `()` are evaluated first
+  </Step>
+  <Step title="Multiplication and Division">
+    `*` and `/` operators (left-to-right)
+  </Step>
+  <Step title="Addition and Subtraction">
+    `+` and `-` operators (left-to-right)
+  </Step>
+</Steps>
+
+### Precedence Examples
+
+```expresiones
+program {
+    int x = 10;
+    int y = 5;
+    
+    // Multiplication before addition
+    int resultado = x + y * 2;     // 10 + (5 * 2) = 20
+    
+    // Division before subtraction
+    int calc = x - y / 5;          // 10 - (5 / 5) = 9
+    
+    // Multiple operations
+    int complejo = x + y * 2 - 8;  // 10 + (5 * 2) - 8 = 12
+}
+```
+
+<Warning>
+Without parentheses, multiplication and division are always performed before addition and subtraction.
+</Warning>
+
+## Parentheses
+
+Use parentheses to override default precedence or improve clarity:
+
+```expresiones
+program {
+    int x = 10;
+    int y = 5;
+    
+    // Force addition first
+    int resultado = (x + y) * 2;        // (10 + 5) * 2 = 30
+    
+    // Complex expression with parentheses
+    int calculoFinal = (x - 90 + y) / 5; // (10 - 90 + 5) / 5 = -15
+    
+    // Multiple nested parentheses
+    int complejo = ((x + y) * 2) - 8;    // ((10 + 5) * 2) - 8 = 22
+}
+```
+
+### Nested Parentheses
+
+```expresiones
+program {
+    int a = 5;
+    int b = 3;
+    int c = 2;
+    
+    // Innermost parentheses evaluated first
+    int resultado = ((a + b) * c) + 1;  // ((5 + 3) * 2) + 1 = 17
+}
+```
+
+## Expression Grammar
+
+The formal grammar for expressions:
+
+```antlr
+expr: expr (MULT | DIV) expr         // Multiplication/Division
+    | expr (SUMA | RESTA) expr        // Addition/Subtraction
+    | NUMERO                          // Numeric literal
+    | ID                              // Variable reference
+    | PAR_IZQ expr PAR_DER            // Parenthesized expression
+```
+
+<Info>
+The grammar defines precedence implicitly through rule ordering: multiplication/division before addition/subtraction.
+</Info>
+
+## Complete Examples
+
+### Example 1: Basic Arithmetic
+
+```expresiones
+program {
+    int valorUno = 5;
+    int valorDos = 10;
+    int resultado = valorUno + valorDos;  // 15
+}
+```
+
+### Example 2: Operator Precedence
+
+```expresiones
+program {
+    int x = 10;
+    int y = 5;
+    int resultado = 0;
+    
+    // Multiplication before addition
+    // 10 + 5 * 2 = 20
+    resultado = x + y * 2;
+}
+```
+
+### Example 3: Complex Expression
+
+```expresiones
+program {
+    int x = 10;
+    int y = 5;
+    
+    // Nested operations with parentheses
+    x = x + 100;              // x = 110
+    y = y * y;                // y = 25
+    
+    // (110 - 90 + 25) / 5 = 45 / 5 = 9
+    int calculoFinal = (x - 90 + y) / 5;
+}
+```
+
+### Example 4: Float Expressions
+
+```expresiones
+program {
+    float pi = 3.14;
+    int radius = 10;
+    
+    // Mixed int and float arithmetic
+    float area = pi * radius;  // 31.4
+}
+```
+
+## Expression Evaluation
+
+### Left-to-Right Evaluation
+
+Operators with the same precedence are evaluated left-to-right:
+
+```expresiones
+int x = 10 - 5 - 2;    // (10 - 5) - 2 = 3
+int y = 20 / 5 / 2;    // (20 / 5) / 2 = 2
+int z = 2 * 3 * 4;     // (2 * 3) * 4 = 24
+```
+
+### Mixed Precedence
+
+```expresiones
+// Step-by-step evaluation:
+int resultado = 10 + 5 * 2 - 8 / 4;
+
+// Step 1: 5 * 2 = 10
+// Step 2: 8 / 4 = 2
+// Step 3: 10 + 10 = 20
+// Step 4: 20 - 2 = 18
+// resultado = 18
+```
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Use Parentheses for Clarity" icon="brackets-round">
+    Even when not required, parentheses improve readability
+    ```expresiones
+    int x = (a + b) * c;  // Clear intent
+    ```
+  </Card>
+  
+  <Card title="Break Complex Expressions" icon="code-branch">
+    Split complex calculations into multiple statements
+    ```expresiones
+    int temp = x + y;
+    int resultado = temp * 2;
+    ```
+  </Card>
+  
+  <Card title="Mind the Precedence" icon="list-ol">
+    Remember: `*` and `/` before `+` and `-`
+    ```expresiones
+    int x = 10 + 5 * 2;  // 20, not 30
+    ```
+  </Card>
+  
+  <Card title="Use Meaningful Names" icon="signature">
+    Choose variable names that describe the value
+    ```expresiones
+    int area = width * height;
+    ```
+  </Card>
+</CardGroup>

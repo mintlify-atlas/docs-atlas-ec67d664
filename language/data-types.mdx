@@ -1,0 +1,222 @@
+---
+title: 'Data Types'
+description: 'Explore the data types available in the Expresiones language'
+---
+
+## Overview
+
+Expresiones is a statically-typed language with three primitive data types:
+
+<CardGroup cols={3}>
+  <Card title="int" icon="hashtag">
+    Integer numbers
+  </Card>
+  <Card title="float" icon="calculator">
+    Floating-point numbers
+  </Card>
+  <Card title="bool" icon="toggle-on">
+    Boolean values
+  </Card>
+</CardGroup>
+
+## Integer Type (`int`)
+
+The `int` type represents whole numbers without decimal points.
+
+### Declaration and Usage
+
+```expresiones
+// Declaration without initialization
+int x;
+
+// Declaration with initialization
+int y = 10;
+int valorUno = 5;
+int resultado = 0;
+```
+
+### Integer Literals
+
+Integer literals are sequences of digits:
+
+```expresiones
+int a = 0;
+int b = 42;
+int c = 1000;
+```
+
+<Note>
+Integers can be used in arithmetic operations and comparisons.
+</Note>
+
+## Floating-Point Type (`float`)
+
+The `float` type represents numbers with decimal points.
+
+### Declaration and Usage
+
+```expresiones
+// Declaration with decimal value
+float pi = 3.14;
+float area = 0.0;
+```
+
+### Float Literals
+
+Float literals must include a decimal point followed by digits:
+
+```expresiones
+float x = 3.14;
+float y = 10.0;
+float z = 0.5;
+```
+
+### Float Operations
+
+```expresiones
+program {
+    float pi = 3.14;
+    int radius = 10;
+    
+    // Mixed arithmetic (int and float)
+    float area = pi * radius;
+}
+```
+
+<Warning>
+Mixing `int` and `float` in operations is supported by the language grammar.
+</Warning>
+
+## Boolean Type (`bool`)
+
+The `bool` type represents logical true/false values.
+
+### Declaration and Usage
+
+```expresiones
+// Boolean declaration
+bool activo = 1;  // True
+bool error = 0;   // False
+```
+
+<Info>
+In Expresiones, boolean values are represented using integers: `1` for true and `0` for false.
+</Info>
+
+### Boolean in Conditionals
+
+```expresiones
+program {
+    bool activo = 1;
+    int x = 10;
+    
+    if (activo == 1) {
+        x = x + 100;
+    }
+}
+```
+
+## Type System
+
+### Static Typing
+
+Expresiones requires explicit type declarations:
+
+```expresiones
+int x = 10;        // ✓ Correct
+float pi = 3.14;   // ✓ Correct
+bool flag = 1;     // ✓ Correct
+
+// Variables must be declared before use
+y = 5;             // ✗ Error: y not declared
+```
+
+### Type Grammar
+
+The formal grammar for types:
+
+```antlr
+TIPO : 'int' | 'float' | 'bool'
+```
+
+## Numeric Literals
+
+### Number Grammar
+
+The grammar accepts both integer and floating-point literals:
+
+```antlr
+NUMERO : [0-9]+ ('.' [0-9]+)?
+```
+
+### Valid Number Literals
+
+```expresiones
+10       // Integer
+42       // Integer
+3.14     // Float
+0.5      // Float
+100.0    // Float
+```
+
+### Invalid Literals
+
+```expresiones
+.5       // ✗ Must start with digit
+10.      // ✗ Must have digits after decimal
+3.14.15  // ✗ Only one decimal point allowed
+```
+
+## Complete Example
+
+```expresiones
+program {
+    // Integer variables
+    int x = 10;
+    int y = 5;
+    int resultado = 0;
+    
+    // Floating-point variable
+    float pi = 3.14;
+    
+    // Boolean variable
+    bool activo = 1;
+    
+    // Arithmetic with different types
+    resultado = x + y * 2;          // 10 + 5 * 2 = 20
+    float area = pi * 10;            // 3.14 * 10 = 31.4
+    
+    // Boolean in conditions
+    if (resultado > 15 && activo == 1) {
+        x = x + 100;
+    }
+}
+```
+
+## Type Usage Guidelines
+
+<AccordionGroup>
+  <Accordion title="When to use int">
+    Use `int` for:
+    - Counting and indexing
+    - Whole number calculations
+    - Boolean-like flags (0 or 1)
+    - Results that don't need decimal precision
+  </Accordion>
+  
+  <Accordion title="When to use float">
+    Use `float` for:
+    - Scientific calculations
+    - Measurements requiring decimal precision
+    - Mathematical constants (like pi)
+    - Division results that need precision
+  </Accordion>
+  
+  <Accordion title="When to use bool">
+    Use `bool` for:
+    - Flags and state indicators
+    - Condition results
+    - True/false logic
+    - Control flow decisions
+  </Accordion>
+</AccordionGroup>

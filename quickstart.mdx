@@ -1,80 +1,260 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+title: Quickstart
+description: Compile your first Expresiones program in minutes
 ---
 
-## Get started in three steps
+## Your First Program
 
-Get your documentation site running locally and make your first customization.
+Let's create and compile a simple Expresiones program that demonstrates variable declarations, arithmetic operations, and conditional logic.
 
-### Step 1: Set up your local environment
+<Steps>
+  <Step title="Create a Program File">
+    Create a new file called `programa.txt` with the following content:
 
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
+    ```txt
+    program{
+        int valorUno; 
+        int valorDos; 
+        int resultado;
+        int exito; 
+        int error;
+
+        valorUno = 5; 
+        valorDos = 10; 
+        resultado = valorUno + valorDos;
+
+        if(resultado > 10){
+            exito = 1; 
+        } else {
+            error = 0; 
+        }
+    }
+    ```
+
+    <Note>
+      Every Expresiones program must start with the `program` keyword followed by a block enclosed in curly braces.
+    </Note>
+  </Step>
+
+  <Step title="Run the Compiler">
+    Navigate to your source directory and run the compiler:
+
+    ```bash
+    cd workspace/source
+    python Prueba.py
+    ```
+
+    A file dialog will open. Select your `programa.txt` file.
+  </Step>
+
+  <Step title="View the Output">
+    The compiler will execute your program and display the symbol table:
+
+    ```
+    Iniciando ejecución...
+    Declaración: valorUno (int) = None
+    Declaración: valorDos (int) = None
+    Declaración: resultado (int) = None
+    Declaración: exito (int) = None
+    Declaración: error (int) = None
+    Asignación: valorUno = 5
+    Asignación: valorDos = 10
+    Asignación: resultado = 15
+    Asignación: exito = 1
+
+    --- TABLA DE SÍMBOLOS FINAL ---
+    ID              | Tipo       | Valor     
+    ----------------------------------------
+    valorUno        | int        | 5
+    valorDos        | int        | 10
+    resultado       | int        | 15
+    exito           | int        | 1
+    error           | int        | None
+    ```
+
+    The symbol table shows all declared variables with their final types and values.
+  </Step>
+</Steps>
+
+## Understanding the Output
+
+The Expresiones compiler provides two types of output:
+
+### Execution Trace
+
+As the compiler processes your code, it prints execution information:
+- **Declaración**: Shows when a variable is declared with its type and initial value
+- **Asignación**: Shows when a variable is assigned a new value
+
+### Symbol Table
+
+The final symbol table displays:
+- **ID**: Variable name
+- **Tipo**: Variable type (`int`, `float`, or `bool`)
+- **Valor**: Final value after execution (or `None` if never assigned)
+
+## Advanced Example
+
+Here's a more complex example demonstrating all language features:
+
+```txt
+program {
+    // Declarations with initialization
+    int x = 10;
+    int y = 5;
+    float pi = 3.14;
+    bool activo = 1;
+    int resultado = 0;
+
+    // Arithmetic with operator precedence
+    // 10 + 5 * 2 = 20
+    resultado = x + y * 2;
+
+    // Conditional with logical operators
+    if (resultado > 15 && activo == 1) {
+        x = x + 100;
+        
+        // Nested conditional
+        if (x >= 110) {
+            y = y * y; // 5 * 5 = 25
+        } else {
+            y = 0;
+        }
+    } else {
+        resultado = 999;
+    }
+
+    // Parentheses for grouping
+    int calculoFinal = (x - 90 + y) / 5;
     
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
-
-### Step 2: Deploy your changes
-
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
-
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
-
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
-
-### Step 3: Go live
-
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
-
-## Next steps
-
-Now that you have your docs running, explore these key features:
-
-<CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
-</CardGroup>
+    float area = pi * 10;
+}
+```
 
 <Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
+  This example is from `entrada.txt` in the source repository and demonstrates:
+  - Variable declarations with initialization
+  - Arithmetic operations with correct precedence
+  - Logical operators (`&&`, `||`, `!`)
+  - Nested conditionals
+  - Parentheses for expression grouping
+  - Mixed integer and floating-point arithmetic
 </Note>
+
+## Language Features
+
+### Data Types
+
+Expresiones supports three data types:
+
+<CodeGroup>
+  ```txt int
+  int contador = 42;
+  int resultado;
+  ```
+
+  ```txt float
+  float pi = 3.14159;
+  float area = 10.5;
+  ```
+
+  ```txt bool
+  bool activo = 1;  // 1 for true
+  bool inactivo = 0; // 0 for false
+  ```
+</CodeGroup>
+
+### Operators
+
+**Arithmetic**: `+`, `-`, `*`, `/`
+
+**Relational**: `>`, `<`, `==`, `!=` (or `<>`), `>=`, `<=`
+
+**Logical**: `&&` (and), `||` (or), `!` (not)
+
+### Control Flow
+
+Conditional statements with optional else clause:
+
+```txt
+if (x > 10) {
+    y = 1;
+} else {
+    y = 0;
+}
+```
+
+### Comments
+
+Single-line comments start with `//`:
+
+```txt
+// This is a comment
+int x = 10; // Inline comment
+```
+
+## Common Patterns
+
+<Warning>
+  **Semantic Errors**: If you try to use a variable before declaring it or declare the same variable twice, the compiler will report a semantic error.
+</Warning>
+
+### Variable Declaration
+
+```txt
+// Declaration without initialization
+int x;
+
+// Declaration with initialization
+int y = 10;
+```
+
+### Complex Conditions
+
+```txt
+// Combining multiple logical operators
+if ((x > 5 && y < 10) || !activo) {
+    resultado = 100;
+}
+```
+
+### Arithmetic Expressions
+
+```txt
+// Operator precedence: * and / before + and -
+resultado = x + y * 2;        // y is multiplied first
+
+// Use parentheses to override precedence
+resultado = (x + y) * 2;      // addition happens first
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Explore the Grammar" icon="book" href="/development/grammar">
+    Learn about the complete grammar definition in `Expresiones.g`
+  </Card>
+
+  <Card title="Visitor Pattern" icon="code" href="/architecture/visitor">
+    Understand how the Visitor pattern is used to traverse the AST
+  </Card>
+
+  <Card title="Language Reference" icon="book-open" href="/language/syntax">
+    Dive into the complete language syntax and semantics
+  </Card>
+
+  <Card title="Examples" icon="code-branch" href="/examples/basic-arithmetic">
+    Explore more code examples and patterns
+  </Card>
+</CardGroup>
+
+## Running Without GUI
+
+If you want to run the compiler without the file dialog (useful for automation), you can modify `Prueba.py:16-18`:
+
+```python
+def main():
+    # ruta = seleccionar_archivo()
+    ruta = "entrada.txt"  # Hardcode the file path
+    if not ruta: return
+```

@@ -1,0 +1,544 @@
+---
+title: Symbol Table Management
+description: Detailed documentation of the symbol table implementation and variable scope management
+---
+
+## Overview
+
+The symbol table is a critical data structure in the Expresiones compiler that tracks all declared variables, their types, and runtime values. It enables variable resolution, duplicate detection, and semantic analysis.
+
+## Simbolo Class Definition
+
+The `Simbolo` class represents a single symbol (variable) in the symbol table.
+
+From `Visitor.py:4-8`:
+
+```python
+class Simbolo:
+    def __init__(self, nombre, tipo, valor=None):
+        self.nombre = nombre  # Variable identifier
+        self.tipo = tipo      # Type: 'int', 'float', or 'bool'
+        self.valor = valor    # Runtime value (can be None)
+```
+
+Location: `~/workspace/source/Visitor.py:4`
+
+### Attributes
+
+<ParamField path="nombre" type="str" required>
+  The variable's identifier name as declared in the source code.
+  
+  **Example:** `'x'`, `'counter'`, `'totalValue'`
+</ParamField>
+
+<ParamField path="tipo" type="str" required>
+  The variable's data type. One of:
+  - `'int'` - Integer type
+  - `'float'` - Floating-point type
+  - `'bool'` - Boolean type
+  
+  **Note:** Type is stored as string matching the grammar's `TIPO` token.
+</ParamField>
+
+<ParamField path="valor" type="int | float | bool | None" default="None">
+  The runtime value of the variable.
+  - Set to `None` for uninitialized variables
+  - Updated by assignments during execution
+  - Type depends on the `tipo` field
+</ParamField>
+
+## Symbol Table Structure
+
+The symbol table is implemented as a Python dictionary maintained by the `Visitor` class.
+
+From `Visitor.py:10-12`:
+
+```python
+class Visitor(ExpresionesVisitor):
+    def __init__(self):
+        self.tabla_simbolos = {}  # Dictionary: {nombre: Simbolo}
+```
+
+**Structure:**
+```python
+{
+    'x': Simbolo(nombre='x', tipo='int', valor=10),
+    'pi': Simbolo(nombre='pi', tipo='float', valor=3.14),
+    'flag': Simbolo(nombre='flag', tipo='bool', valor=None)
+}
+```
+
+<Note>
+The current implementation uses a single global symbol table. This means no support for:
+- Function scopes
+- Block scopes
+- Nested scopes
+- Shadowing
+
+All variables are globally accessible within the program.
+</Note>
+
+## Symbol Table Operations
+
+### 1. Symbol Declaration
+
+Symbols are added to the table during variable declarations in `visitInstrDecl()`.
+
+From `Visitor.py:18-31`:
+
+```python
+def visitInstrDecl(self, ctx):
+    tipo = ctx.declaracion().TIPO().getText()
+    nombre = ctx.declaracion().ID().getText()
+    
+    valor_inicial = None
+    if ctx.declaracion().ASIGNACION():
+        valor_inicial = self.visit(ctx.declaracion().expr())
+    
+    if nombre in self.tabla_simbolos:
+        print(f"Error Semántico: Variable '{nombre}' ya declarada.")
+    else:
+        self.tabla_simbolos[nombre] = Simbolo(nombre, tipo, valor_inicial)
+        print(f"Declaración: {nombre} ({tipo}) = {valor_inicial}")
+    return None
+```
+
+**Process:**
+
+<Steps>
+  <Step title="Extract Declaration Information">
+    Extract type, name, and optional initialization expression from the parse tree context.
+  </Step>
+  
+  <Step title="Evaluate Initialization">
+    If initialization expression exists, evaluate it to get the initial value.
+  </Step>
+  
+  <Step title="Check for Duplicates">
+    Search symbol table for existing symbol with same name.
+    - If found: Report semantic error
+    - If not found: Proceed to step 4
+  </Step>
+  
+  <Step title="Create Symbol">
+    Create new `Simbolo` object with extracted information.
+  </Step>
+  
+  <Step title="Insert into Table">
+    Add symbol to `tabla_simbolos` dictionary with name as key.
+  </Step>
+</Steps>
+
+**Examples:**
+
+<Accordion title="Example 1: Simple Declaration">
+**Source:**
+```expresiones
+int x;
+```
+
+**Symbol Table After:**
+```python
+{
+    'x': Simbolo(nombre='x', tipo='int', valor=None)
+}
+```
+
+**Output:** `Declaración: x (int) = None`
+</Accordion>
+
+<Accordion title="Example 2: Declaration with Initialization">
+**Source:**
+```expresiones
+float pi = 3.14159;
+```
+
+**Symbol Table After:**
+```python
+{
+    'pi': Simbolo(nombre='pi', tipo='float', valor=3.14159)
+}
+```
+
+**Output:** `Declaración: pi (float) = 3.14159`
+</Accordion>
+
+<Accordion title="Example 3: Duplicate Declaration (Error)">
+**Source:**
+```expresiones
+int x = 5;
+int x = 10;
+```
+
+**Symbol Table After:**
+```python
+{
+    'x': Simbolo(nombre='x', tipo='int', valor=5)  # First declaration only
+}
+```
+
+**Output:**
+```
+Declaración: x (int) = 5
+Error Semántico: Variable 'x' ya declarada.
+```
+</Accordion>
+
+### 2. Symbol Lookup (Variable Reference)
+
+Symbols are retrieved during variable references in `visitVariable()`.
+
+From `Visitor.py:83-88`:
+
+```python
+def visitVariable(self, ctx):
+    nombre = ctx.ID().getText()
+    if nombre in self.tabla_simbolos:
+        val = self.tabla_simbolos[nombre].valor
+        return val if val is not None else 0
+    return 0
+```
+
+**Process:**
+
+<Steps>
+  <Step title="Extract Variable Name">
+    Get identifier from parse tree context.
+  </Step>
+  
+  <Step title="Search Symbol Table">
+    Check if symbol exists in `tabla_simbolos` dictionary.
+  </Step>
+  
+  <Step title="Return Value">
+    - If found: Return symbol's `valor` (or 0 if `None`)
+    - If not found: Return 0 (masks undeclared variable error)
+  </Step>
+</Steps>
+
+<Warning>
+The current implementation returns `0` for undeclared variables instead of raising an error. This can mask bugs. Consider modifying to:
+
+```python
+def visitVariable(self, ctx):
+    nombre = ctx.ID().getText()
+    if nombre not in self.tabla_simbolos:
+        print(f"Error: Variable '{nombre}' no declarada.")
+        return 0
+    val = self.tabla_simbolos[nombre].valor
+    return val if val is not None else 0
+```
+</Warning>
+
+**Example:**
+
+```expresiones
+int x = 10;
+int y = x + 5;
+```
+
+**Execution:**
+1. Declare `x` with value `10`
+2. When evaluating `x + 5`:
+   - `visitVariable('x')` looks up `x` in symbol table
+   - Returns `10`
+3. Arithmetic: `10 + 5 = 15`
+4. Declare `y` with value `15`
+
+### 3. Symbol Update (Variable Assignment)
+
+Symbol values are updated during assignments in `visitInstrAsig()`.
+
+From `Visitor.py:33-42`:
+
+```python
+def visitInstrAsig(self, ctx):
+    nombre = ctx.asignacion().ID().getText()
+    valor = self.visit(ctx.asignacion().expr())
+    
+    if nombre in self.tabla_simbolos:
+        self.tabla_simbolos[nombre].valor = valor
+        print(f"Asignación: {nombre} = {valor}")
+    else:
+        print(f"Error: Variable '{nombre}' no declarada.")
+    return valor
+```
+
+**Process:**
+
+<Steps>
+  <Step title="Extract Assignment Information">
+    Get variable name and evaluate right-hand expression.
+  </Step>
+  
+  <Step title="Verify Declaration">
+    Check if variable exists in symbol table.
+  </Step>
+  
+  <Step title="Update Value">
+    If variable exists, update its `valor` attribute.
+  </Step>
+  
+  <Step title="Error Handling">
+    If variable doesn't exist, report error (but don't crash).
+  </Step>
+</Steps>
+
+**Example:**
+
+```expresiones
+int counter = 0;
+counter = 10;
+counter = counter + 5;
+```
+
+**Symbol Table Evolution:**
+
+| After Statement | Symbol Table State |
+|----------------|--------------------|
+| `int counter = 0;` | `{'counter': Simbolo('counter', 'int', 0)}` |
+| `counter = 10;` | `{'counter': Simbolo('counter', 'int', 10)}` |
+| `counter = counter + 5;` | `{'counter': Simbolo('counter', 'int', 15)}` |
+
+## Symbol Table Lifecycle
+
+<Steps>
+  <Step title="Initialization">
+    When `Visitor` is instantiated, `tabla_simbolos` is created as empty dictionary.
+    
+    ```python
+    visitor = Visitor()  # tabla_simbolos = {}
+    ```
+  </Step>
+  
+  <Step title="Population During Traversal">
+    As the visitor traverses the AST, `visitInstrDecl()` adds symbols for each declaration.
+  </Step>
+  
+  <Step title="Access During Execution">
+    Variable references and assignments read/write symbol table entries.
+  </Step>
+  
+  <Step title="Persistence">
+    Symbol table persists for entire program execution (single global scope).
+  </Step>
+  
+  <Step title="Destruction">
+    Symbol table is destroyed when `Visitor` object is garbage collected.
+  </Step>
+</Steps>
+
+## Complete Example
+
+**Source Code:**
+```expresiones
+program {
+    int x = 5;
+    int y;
+    float pi = 3.14;
+    y = x * 2;
+    x = y + 1;
+}
+```
+
+**Symbol Table Evolution:**
+
+<Accordion title="After Declaration: int x = 5;">
+```python
+{
+    'x': Simbolo(nombre='x', tipo='int', valor=5)
+}
+```
+</Accordion>
+
+<Accordion title="After Declaration: int y;">
+```python
+{
+    'x': Simbolo(nombre='x', tipo='int', valor=5),
+    'y': Simbolo(nombre='y', tipo='int', valor=None)
+}
+```
+</Accordion>
+
+<Accordion title="After Declaration: float pi = 3.14;">
+```python
+{
+    'x': Simbolo(nombre='x', tipo='int', valor=5),
+    'y': Simbolo(nombre='y', tipo='int', valor=None),
+    'pi': Simbolo(nombre='pi', tipo='float', valor=3.14)
+}
+```
+</Accordion>
+
+<Accordion title="After Assignment: y = x * 2;">
+```python
+{
+    'x': Simbolo(nombre='x', tipo='int', valor=5),
+    'y': Simbolo(nombre='y', tipo='int', valor=10),  # Updated
+    'pi': Simbolo(nombre='pi', tipo='float', valor=3.14)
+}
+```
+</Accordion>
+
+<Accordion title="After Assignment: x = y + 1;">
+```python
+{
+    'x': Simbolo(nombre='x', tipo='int', valor=11),  # Updated
+    'y': Simbolo(nombre='y', tipo='int', valor=10),
+    'pi': Simbolo(nombre='pi', tipo='float', valor=3.14)
+}
+```
+</Accordion>
+
+**Console Output:**
+```
+Iniciando ejecución...
+Declaración: x (int) = 5
+Declaración: y (int) = None
+Declaración: pi (float) = 3.14
+Asignación: y = 10
+Asignación: x = 11
+```
+
+## Limitations and Future Enhancements
+
+### Current Limitations
+
+<Warning>
+**Single Global Scope**
+
+All variables share one global namespace. No support for:
+- Function scopes
+- Block-level scoping (variables inside `if` blocks are globally visible)
+- Nested scopes
+- Variable shadowing
+</Warning>
+
+<Warning>
+**No Type Checking**
+
+Type information is stored but not enforced:
+```expresiones
+int x = 10;
+x = 3.14;  // No error, x now contains float
+```
+</Warning>
+
+<Warning>
+**Silent Undeclared Variables**
+
+`visitVariable()` returns `0` for undeclared variables instead of raising errors.
+</Warning>
+
+### Potential Enhancements
+
+<Accordion title="1. Implement Scoped Symbol Tables">
+**Goal:** Support block-level and function-level scopes.
+
+**Implementation:**
+```python
+class Visitor(ExpresionesVisitor):
+    def __init__(self):
+        self.scopes = [{}]  # Stack of scopes, [0] is global
+    
+    def enterScope(self):
+        self.scopes.append({})
+    
+    def exitScope(self):
+        self.scopes.pop()
+    
+    def lookup(self, nombre):
+        # Search from innermost to outermost scope
+        for scope in reversed(self.scopes):
+            if nombre in scope:
+                return scope[nombre]
+        return None
+    
+    def declare(self, nombre, simbolo):
+        # Add to current (innermost) scope
+        self.scopes[-1][nombre] = simbolo
+```
+
+**Usage:**
+```python
+def visitBloque(self, ctx):
+    self.enterScope()
+    result = self.visitChildren(ctx)
+    self.exitScope()
+    return result
+```
+</Accordion>
+
+<Accordion title="2. Add Type Checking">
+**Goal:** Enforce type safety during assignments.
+
+**Implementation:**
+```python
+def visitInstrAsig(self, ctx):
+    nombre = ctx.asignacion().ID().getText()
+    valor = self.visit(ctx.asignacion().expr())
+    
+    if nombre not in self.tabla_simbolos:
+        print(f"Error: Variable '{nombre}' no declarada.")
+        return None
+    
+    simbolo = self.tabla_simbolos[nombre]
+    
+    # Type checking
+    if simbolo.tipo == 'int' and not isinstance(valor, int):
+        print(f"Error de Tipo: '{nombre}' es 'int', no se puede asignar {type(valor).__name__}")
+        return None
+    elif simbolo.tipo == 'float' and not isinstance(valor, (int, float)):
+        print(f"Error de Tipo: '{nombre}' es 'float', no se puede asignar {type(valor).__name__}")
+        return None
+    elif simbolo.tipo == 'bool' and not isinstance(valor, bool):
+        print(f"Error de Tipo: '{nombre}' es 'bool', no se puede asignar {type(valor).__name__}")
+        return None
+    
+    simbolo.valor = valor
+    print(f"Asignación: {nombre} = {valor}")
+    return valor
+```
+</Accordion>
+
+<Accordion title="3. Add Symbol Table Inspection">
+**Goal:** Provide debugging and inspection capabilities.
+
+**Implementation:**
+```python
+class Visitor(ExpresionesVisitor):
+    # ... existing code ...
+    
+    def printSymbolTable(self):
+        print("\n=== SYMBOL TABLE ===")
+        print(f"{'Variable':<15} {'Type':<10} {'Value':<15}")
+        print("-" * 40)
+        for nombre, simbolo in self.tabla_simbolos.items():
+            print(f"{nombre:<15} {simbolo.tipo:<10} {simbolo.valor!s:<15}")
+        print("=" * 40 + "\n")
+```
+
+**Usage:**
+```python
+visitor = Visitor()
+visitor.visit(tree)
+visitor.printSymbolTable()
+```
+
+**Output:**
+```
+=== SYMBOL TABLE ===
+Variable        Type       Value          
+----------------------------------------
+x               int        11             
+y               int        10             
+pi              float      3.14           
+========================================
+```
+</Accordion>
+
+<Note>
+See also:
+- [Visitor Pattern](/architecture/visitor) - Symbol table usage in visitor methods
+- [Architecture Overview](/architecture/overview) - Symbol table role in compilation
+</Note>

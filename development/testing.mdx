@@ -1,0 +1,614 @@
+---
+title: Testing the Compiler
+description: How to create test programs, run them with Prueba.py, and validate output
+---
+
+## Overview
+
+The Expresiones compiler uses `Prueba.py` as a test runner to execute programs and display results. This guide covers creating test programs, running them, and interpreting output.
+
+## Test Runner Architecture
+
+### Prueba.py Structure
+
+```python
+import sys
+import tkinter as tk
+from tkinter import filedialog
+from antlr4 import *
+from ExpresionesLexer import ExpresionesLexer
+from ExpresionesParser import ExpresionesParser
+from Visitor import Visitor
+```
+
+The test runner:
+1. Loads a source file using a GUI file dialog
+2. Creates a lexer and parser from ANTLR
+3. Parses the input into an AST
+4. Executes the visitor on the AST
+5. Displays the final symbol table
+
+### Main Execution Flow
+
+```python
+def main():
+    ruta = seleccionar_archivo()
+    if not ruta: return
+    try:
+        input_stream = FileStream(ruta, encoding='utf-8')
+        lexer = ExpresionesLexer(input_stream)
+        stream = CommonTokenStream(lexer)
+        parser = ExpresionesParser(stream)
+        tree = parser.root()
+
+        if parser.getNumberOfSyntaxErrors() > 0:
+            print("\n[ERROR] Se detectaron errores sintácticos.")
+        else:
+            v = Visitor()
+            v.visit(tree)
+            print("\n--- TABLA DE SÍMBOLOS FINAL ---")
+            print(f"{'ID':<15} | {'Tipo':<10} | {'Valor':<10}")
+            print("-" * 40)
+            for n, s in v.tabla_simbolos.items():
+                print(f"{n:<15} | {s.tipo:<10} | {s.valor}")
+    except Exception as e:
+        print(f"Error durante la ejecución: {e}")
+```
+
+<Tip>
+The test runner automatically displays syntax errors from the parser before attempting semantic analysis.
+</Tip>
+
+## Running Tests
+
+### Basic Usage
+
+<Steps>
+
+### Step 1: Run the test runner
+
+```bash
+python Prueba.py
+```
+
+### Step 2: Select a source file
+
+A file dialog will appear. Select a `.txt` file containing Expresiones code.
+
+### Step 3: Review output
+
+The console will display:
+- Execution trace (declarations, assignments)
+- Any errors (syntax or semantic)
+- Final symbol table with all variables
+
+</Steps>
+
+### Command Line Testing
+
+For automated testing without GUI, modify `seleccionar_archivo()`:
+
+```python
+def seleccionar_archivo():
+    if len(sys.argv) > 1:
+        return sys.argv[1]
+    root = tk.Tk()
+    root.withdraw()
+    ruta = filedialog.askopenfilename(title="Seleccionar código fuente", filetypes=(("Texto", "*.txt"),))
+    root.destroy()
+    return ruta
+```
+
+Then run:
+```bash
+python Prueba.py test_programs/example.txt
+```
+
+## Creating Test Programs
+
+### Basic Syntax
+
+All Expresiones programs follow this structure:
+
+```
+program {
+    // Your code here
+}
+```
+
+### Test Case: Variable Declarations
+
+**File**: `test_declarations.txt`
+
+```
+program {
+    int x;
+    float y = 3.14;
+    int z = 10;
+}
+```
+
+**Expected Output**:
+```
+Iniciando ejecución...
+Declaración: x (int) = None
+Declaración: y (float) = 3.14
+Declaración: z (int) = 10
+
+--- TABLA DE SÍMBOLOS FINAL ---
+ID              | Tipo       | Valor     
+----------------------------------------
+x               | int        | None
+y               | float      | 3.14
+z               | int        | 10
+```
+
+### Test Case: Arithmetic Operations
+
+**File**: `test_arithmetic.txt`
+
+```
+program {
+    int a = 10;
+    int b = 5;
+    int sum = a + b;
+    int product = a * b;
+    int quotient = a / b;
+}
+```
+
+**Expected Output**:
+```
+Iniciando ejecución...
+Declaración: a (int) = 10
+Declaración: b (int) = 5
+Declaración: sum (int) = 15
+Declaración: product (int) = 50
+Declaración: quotient (int) = 2
+
+--- TABLA DE SÍMBOLOS FINAL ---
+ID              | Tipo       | Valor     
+----------------------------------------
+a               | int        | 10
+b               | int        | 5
+sum             | int        | 15
+product         | int        | 50
+quotient        | int        | 2
+```
+
+### Test Case: Conditional Statements
+
+**File**: `test_conditionals.txt`
+
+```
+program {
+    int x = 10;
+    int y = 5;
+    
+    if (x > y) {
+        x = x + 1;
+    }
+    
+    if (y > x) {
+        y = y * 2;
+    } else {
+        y = y - 1;
+    }
+}
+```
+
+**Expected Output**:
+```
+Iniciando ejecución...
+Declaración: x (int) = 10
+Declaración: y (int) = 5
+Asignación: x = 11
+Asignación: y = 4
+
+--- TABLA DE SÍMBOLOS FINAL ---
+ID              | Tipo       | Valor     
+----------------------------------------
+x               | int        | 11
+y               | int        | 4
+```
+
+### Test Case: Complex Expressions
+
+**File**: `test_expressions.txt`
+
+```
+program {
+    int result = (10 + 5) * 2 - 3;
+    float pi = 3.14;
+    float area = pi * 10 * 10;
+    bool condition = (result > 20) && (area < 400);
+}
+```
+
+### Test Case: Logical Operations
+
+**File**: `test_logic.txt`
+
+```
+program {
+    int x = 10;
+    int y = 20;
+    
+    if ((x < y) && (y > 15)) {
+        x = 100;
+    }
+    
+    if ((x == 10) || (y == 20)) {
+        y = 200;
+    }
+    
+    if (!(x > y)) {
+        x = 50;
+    }
+}
+```
+
+## Testing Error Handling
+
+### Syntax Errors
+
+**File**: `test_syntax_error.txt`
+
+```
+program {
+    int x = 10
+    int y = 20;
+}
+```
+
+**Expected Output**:
+```
+[ERROR] Se detectaron errores sintácticos.
+```
+
+<Warning>
+The program terminates after syntax errors are detected. The visitor is not executed.
+</Warning>
+
+### Semantic Errors
+
+#### Duplicate Declaration
+
+**File**: `test_duplicate.txt`
+
+```
+program {
+    int x = 10;
+    int x = 20;
+}
+```
+
+**Expected Output**:
+```
+Iniciando ejecución...
+Declaración: x (int) = 10
+Error Semántico: Variable 'x' ya declarada.
+```
+
+#### Undeclared Variable
+
+**File**: `test_undeclared.txt`
+
+```
+program {
+    int x = 10;
+    y = x + 5;
+}
+```
+
+**Expected Output**:
+```
+Iniciando ejecución...
+Declaración: x (int) = 10
+Error: Variable 'y' no declarada.
+```
+
+## Automated Test Suite
+
+### Creating a Test Script
+
+Create `run_tests.py`:
+
+```python
+import os
+import sys
+from antlr4 import *
+from ExpresionesLexer import ExpresionesLexer
+from ExpresionesParser import ExpresionesParser
+from Visitor import Visitor
+
+def run_test(filepath, expected_vars=None):
+    """
+    Run a test file and optionally validate expected variables.
+    
+    Args:
+        filepath: Path to test file
+        expected_vars: Dict of expected {variable: value} pairs
+    
+    Returns:
+        True if test passes, False otherwise
+    """
+    print(f"\n{'='*50}")
+    print(f"Testing: {filepath}")
+    print('='*50)
+    
+    try:
+        input_stream = FileStream(filepath, encoding='utf-8')
+        lexer = ExpresionesLexer(input_stream)
+        stream = CommonTokenStream(lexer)
+        parser = ExpresionesParser(stream)
+        tree = parser.root()
+        
+        if parser.getNumberOfSyntaxErrors() > 0:
+            print("FAIL: Syntax errors detected")
+            return False
+        
+        v = Visitor()
+        v.visit(tree)
+        
+        # Validate expected variables if provided
+        if expected_vars:
+            for var, expected_val in expected_vars.items():
+                if var not in v.tabla_simbolos:
+                    print(f"FAIL: Variable '{var}' not found")
+                    return False
+                actual_val = v.tabla_simbolos[var].valor
+                if actual_val != expected_val:
+                    print(f"FAIL: {var} = {actual_val}, expected {expected_val}")
+                    return False
+        
+        print("PASS")
+        return True
+        
+    except Exception as e:
+        print(f"FAIL: {e}")
+        return False
+
+def main():
+    tests = [
+        ("test_declarations.txt", {"x": None, "y": 3.14, "z": 10}),
+        ("test_arithmetic.txt", {"sum": 15, "product": 50}),
+        ("test_conditionals.txt", {"x": 11, "y": 4}),
+    ]
+    
+    passed = 0
+    failed = 0
+    
+    for test_file, expected in tests:
+        if run_test(f"test_programs/{test_file}", expected):
+            passed += 1
+        else:
+            failed += 1
+    
+    print(f"\n{'='*50}")
+    print(f"Results: {passed} passed, {failed} failed")
+    print('='*50)
+
+if __name__ == '__main__':
+    main()
+```
+
+### Running the Test Suite
+
+```bash
+python run_tests.py
+```
+
+## Debugging Test Failures
+
+### Add Verbose Logging
+
+Modify visitor methods to output more information:
+
+```python
+def visitAritmetica(self, ctx):
+    izq = self.visit(ctx.expr(0))
+    der = self.visit(ctx.expr(1))
+    op = ctx.getChild(1).getSymbol().type
+    
+    print(f"[DEBUG] Arithmetic: {izq} op {der}")
+    
+    if op == ExpresionesParser.SUMA: 
+        result = izq + der
+        print(f"[DEBUG] Result: {result}")
+        return result
+    # ...
+```
+
+### Use AST Visualization
+
+Add to `Prueba.py`:
+
+```python
+from antlr4.tree.Trees import Trees
+
+# After parsing
+tree = parser.root()
+print("\n--- PARSE TREE ---")
+print(Trees.toStringTree(tree, None, parser))
+```
+
+### Check Symbol Table State
+
+Add checkpoints in your test:
+
+```python
+v = Visitor()
+v.visit(tree)
+
+print("\n--- SYMBOL TABLE DEBUG ---")
+for name, symbol in v.tabla_simbolos.items():
+    print(f"{name}: tipo={symbol.tipo}, valor={symbol.valor}, type={type(symbol.valor)}")
+```
+
+## Testing New Features
+
+<Steps>
+
+### Step 1: Write Minimal Test
+
+Create the simplest possible test for your feature:
+
+```
+program {
+    print(42);
+}
+```
+
+### Step 2: Verify Grammar
+
+Ensure the parser accepts the syntax:
+
+```python
+tree = parser.root()
+if parser.getNumberOfSyntaxErrors() > 0:
+    print("Grammar issue - check Expresiones.g")
+```
+
+### Step 3: Test Visitor
+
+Verify the visitor method is called:
+
+```python
+def visitInstrPrint(self, ctx):
+    print("[TEST] visitInstrPrint called")
+    valor = self.visit(ctx.expr())
+    print(f"Output: {valor}")
+    return None
+```
+
+### Step 4: Add Edge Cases
+
+Test boundary conditions:
+
+```
+program {
+    int x;
+    print(x);  // Uninitialized variable
+    
+    int y = 0;
+    print(10 / y);  // Division by zero
+}
+```
+
+</Steps>
+
+## Output Validation
+
+The test runner displays a final symbol table:
+
+```
+--- TABLA DE SÍMBOLOS FINAL ---
+ID              | Tipo       | Valor     
+----------------------------------------
+x               | int        | 11
+y               | int        | 4
+```
+
+<Tip>
+Parse this output in automated tests to validate variable states without modifying the core visitor.
+</Tip>
+
+## Best Practices
+
+### 1. Test One Thing at a Time
+
+Create focused tests:
+
+```
+// Good - tests one feature
+program {
+    int x = 10 + 5;
+}
+
+// Bad - tests too many things
+program {
+    int x = 10;
+    float y = 3.14;
+    if (x > 5) {
+        x = x * 2;
+    }
+    int z = x + y;
+}
+```
+
+### 2. Name Tests Descriptively
+
+```
+test_arithmetic_addition.txt
+test_arithmetic_division_by_zero.txt
+test_conditional_nested_blocks.txt
+test_error_duplicate_declaration.txt
+```
+
+### 3. Document Expected Behavior
+
+Add comments to test files:
+
+```
+// Test: Variable reassignment
+// Expected: x should be 20 at the end
+program {
+    int x = 10;
+    x = x + 10;
+}
+```
+
+### 4. Use Version Control for Tests
+
+Track test files in git to catch regressions:
+
+```bash
+git add test_programs/
+git commit -m "Add test for new while loop feature"
+```
+
+## Common Test Patterns
+
+### Testing Operator Precedence
+
+```
+program {
+    int result1 = 2 + 3 * 4;     // Should be 14, not 20
+    int result2 = (2 + 3) * 4;   // Should be 20
+}
+```
+
+### Testing Short-Circuit Evaluation
+
+```
+program {
+    int x = 0;
+    if ((x != 0) && (10 / x > 5)) {
+        x = 1;
+    }
+    // x should remain 0 (no division by zero error)
+}
+```
+
+### Testing Variable Scope
+
+```
+program {
+    int x = 10;
+    if (x > 5) {
+        int y = 20;  // Local to if block
+    }
+    // y should not be accessible here
+}
+```
+
+<Warning>
+The current implementation uses a flat symbol table. Variables declared in nested blocks are accessible globally. See [extending guide](/development/extending) to implement proper scoping.
+</Warning>
+
+## Next Steps
+
+- Learn how to [modify the grammar](/development/grammar) to support new syntax
+- Understand [visitor implementation](/development/extending) to handle new test cases
+- Set up continuous integration to run tests automatically

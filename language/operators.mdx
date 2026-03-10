@@ -1,0 +1,444 @@
+---
+title: 'Operators'
+description: 'Complete reference for all operators in the Expresiones language'
+---
+
+## Overview
+
+Expresiones provides three categories of operators for building expressions and conditions:
+
+<CardGroup cols={3}>
+  <Card title="Arithmetic" icon="calculator" href="#arithmetic-operators">
+    Mathematical operations
+  </Card>
+  <Card title="Relational" icon="equals" href="#relational-operators">
+    Value comparisons
+  </Card>
+  <Card title="Logical" icon="brain" href="#logical-operators">
+    Boolean logic
+  </Card>
+</CardGroup>
+
+## Arithmetic Operators
+
+Arithmetic operators perform mathematical calculations on numeric values.
+
+### Addition (`+`)
+
+Adds two values together:
+
+```expresiones
+int x = 10 + 5;        // 15
+int y = x + 20;        // 35
+float z = 3.14 + 2.0;  // 5.14
+```
+
+### Subtraction (`-`)
+
+Subtracts the right operand from the left:
+
+```expresiones
+int x = 10 - 5;        // 5
+int y = x - 3;         // 2
+float z = 10.5 - 2.5;  // 8.0
+```
+
+### Multiplication (`*`)
+
+Multiplies two values:
+
+```expresiones
+int x = 10 * 5;        // 50
+int y = x * 2;         // 100
+float area = 3.14 * 10; // 31.4
+```
+
+### Division (`/`)
+
+Divides the left operand by the right:
+
+```expresiones
+int x = 10 / 5;        // 2
+int y = 20 / 4;        // 5
+float z = 10.0 / 3.0;  // 3.333...
+```
+
+<Warning>
+Be careful with division by zero, which may cause runtime errors.
+</Warning>
+
+### Arithmetic Operator Grammar
+
+```antlr
+expr: expr (MULT | DIV) expr     // Higher precedence
+    | expr (SUMA | RESTA) expr    // Lower precedence
+
+SUMA  : '+'
+RESTA : '-'
+MULT  : '*'
+DIV   : '/'
+```
+
+## Relational Operators
+
+Relational operators compare two values and return a boolean result (true/false).
+
+### Greater Than (`>`)
+
+Checks if left value is greater than right:
+
+```expresiones
+if (x > 10) { }        // True if x is greater than 10
+if (resultado > 15) { } // True if resultado is greater than 15
+```
+
+### Less Than (`<`)
+
+Checks if left value is less than right:
+
+```expresiones
+if (x < 10) { }        // True if x is less than 10
+if (y < 100) { }       // True if y is less than 100
+```
+
+### Equal To (`==`)
+
+Checks if two values are equal:
+
+```expresiones
+if (x == 10) { }       // True if x equals 10
+if (activo == 1) { }   // True if activo equals 1
+```
+
+<Note>
+Use `==` for comparison, not `=` (which is for assignment).
+</Note>
+
+### Not Equal To (`!=` or `<>`)
+
+Checks if two values are different:
+
+```expresiones
+if (x != 10) { }       // True if x is not equal to 10
+if (y <> 0) { }        // True if y is not equal to 0
+```
+
+<Info>
+Expresiones supports both `!=` and `<>` for "not equal" comparisons.
+</Info>
+
+### Greater Than or Equal (`>=`)
+
+Checks if left value is greater than or equal to right:
+
+```expresiones
+if (x >= 10) { }       // True if x is 10 or greater
+if (x >= 110) { }      // True if x is 110 or greater
+```
+
+### Less Than or Equal (`<=`)
+
+Checks if left value is less than or equal to right:
+
+```expresiones
+if (x <= 10) { }       // True if x is 10 or less
+if (y <= 100) { }      // True if y is 100 or less
+```
+
+### Relational Operator Grammar
+
+```antlr
+condicion
+    : expr op=(MAYOR | MENOR | IGUAL | MAYOR_IGUAL | MENOR_IGUAL | DIFERENTE) expr
+
+MAYOR       : '>'
+MENOR       : '<'
+IGUAL       : '=='
+DIFERENTE   : '!=' | '<>'
+MAYOR_IGUAL : '>='
+MENOR_IGUAL : '<='
+```
+
+### Relational Operators Table
+
+| Operator | Syntax | Description | Example |
+|----------|--------|-------------|----------|
+| Greater than | `>` | Left > Right | `x > 10` |
+| Less than | `<` | Left < Right | `x < 10` |
+| Equal to | `==` | Left == Right | `x == 10` |
+| Not equal | `!=` or `<>` | Left ≠ Right | `x != 10` |
+| Greater or equal | `>=` | Left ≥ Right | `x >= 10` |
+| Less or equal | `<=` | Left ≤ Right | `x <= 10` |
+
+## Logical Operators
+
+Logical operators combine or modify boolean conditions.
+
+### AND Operator (`&&`)
+
+Returns true only if **both** conditions are true:
+
+```expresiones
+if (x > 10 && y < 20) { }           // Both must be true
+if (resultado > 15 && activo == 1) { } // Both must be true
+```
+
+**Truth Table:**
+
+| Left | Right | Result |
+|------|-------|--------|
+| true | true  | **true** |
+| true | false | false |
+| false | true | false |
+| false | false | false |
+
+### OR Operator (`||`)
+
+Returns true if **at least one** condition is true:
+
+```expresiones
+if (x < 5 || y > 10) { }      // At least one must be true
+if (error == 1 || y < 0) { }  // At least one must be true
+```
+
+**Truth Table:**
+
+| Left | Right | Result |
+|------|-------|--------|
+| true | true  | **true** |
+| true | false | **true** |
+| false | true | **true** |
+| false | false | false |
+
+### NOT Operator (`!`)
+
+Inverts a boolean condition:
+
+```expresiones
+if (!(x > 10)) { }        // True if x is NOT greater than 10
+if (!(activo == 1)) { }   // True if activo is NOT equal to 1
+```
+
+**Truth Table:**
+
+| Input | Result |
+|-------|--------|
+| true  | **false** |
+| false | **true** |
+
+### Logical Operator Grammar
+
+```antlr
+condicion
+    : condicion O_LOGICO condicion    // OR
+    | condicion Y_LOGICO condicion    // AND
+    | NO_LOGICO condicion             // NOT
+
+Y_LOGICO  : '&&'
+O_LOGICO  : '||'
+NO_LOGICO : '!'
+```
+
+## Operator Precedence
+
+Operators are evaluated in a specific order:
+
+<Steps>
+  <Step title="Parentheses ()">
+    Highest precedence - evaluated first
+  </Step>
+  <Step title="NOT (!)">
+    Logical negation
+  </Step>
+  <Step title="Multiplication (*) and Division (/)">
+    Arithmetic multiplication and division
+  </Step>
+  <Step title="Addition (+) and Subtraction (-)">
+    Arithmetic addition and subtraction
+  </Step>
+  <Step title="Relational (>, <, ==, !=, >=, <=)">
+    Comparison operators
+  </Step>
+  <Step title="AND (&&)">
+    Logical AND
+  </Step>
+  <Step title="OR (||)">
+    Logical OR - lowest precedence
+  </Step>
+</Steps>
+
+### Precedence Examples
+
+```expresiones
+program {
+    int x = 10;
+    int y = 5;
+    bool activo = 1;
+    
+    // Arithmetic precedence
+    int r1 = x + y * 2;           // 10 + (5 * 2) = 20
+    int r2 = (x + y) * 2;         // (10 + 5) * 2 = 30
+    
+    // Relational before logical
+    if (x > 5 && y < 10) { }      // (x > 5) && (y < 10)
+    
+    // AND before OR
+    if (x > 5 || y < 3 && activo == 1) { }
+    // Evaluated as: x > 5 || ((y < 3) && (activo == 1))
+    
+    // NOT has high precedence
+    if (!(x > 5) || y < 10) { }   // (!(x > 5)) || (y < 10)
+}
+```
+
+## Complete Operator Examples
+
+### Example 1: Arithmetic Expression
+
+```expresiones
+program {
+    int x = 10;
+    int y = 5;
+    
+    // Multiple operators with precedence
+    int resultado = x + y * 2 - 8 / 4;
+    // Step 1: y * 2 = 10
+    // Step 2: 8 / 4 = 2
+    // Step 3: x + 10 = 20
+    // Step 4: 20 - 2 = 18
+    // resultado = 18
+}
+```
+
+### Example 2: Complex Condition
+
+```expresiones
+program {
+    int x = 10;
+    int y = 5;
+    bool activo = 1;
+    int resultado = x + y * 2;  // 20
+    
+    // Relational operators with logical AND
+    if (resultado > 15 && activo == 1) {
+        x = x + 100;
+        
+        // Nested condition with relational operator
+        if (x >= 110) {
+            y = y * y;  // 25
+        } else {
+            y = 0;
+        }
+    } else {
+        resultado = 999;
+    }
+}
+```
+
+### Example 3: All Operator Types
+
+```expresiones
+program {
+    int a = 10;
+    int b = 5;
+    int c = 3;
+    bool flag = 1;
+    
+    // Arithmetic operators
+    int sum = a + b;              // 15
+    int diff = a - b;             // 5
+    int prod = a * b;             // 50
+    int quot = a / b;             // 2
+    
+    // Relational operators
+    if (a > b) { }                // true
+    if (a < b) { }                // false
+    if (a == 10) { }              // true
+    if (a != b) { }               // true
+    if (a >= 10) { }              // true
+    if (b <= 5) { }               // true
+    
+    // Logical operators
+    if (a > b && flag == 1) { }   // true AND true = true
+    if (a < b || flag == 1) { }   // false OR true = true
+    if (!(a < b)) { }             // NOT false = true
+    
+    // Combined operators
+    if ((a + b) * c > 40 && flag == 1) {
+        // (10 + 5) * 3 > 40 && 1 == 1
+        // 45 > 40 && true
+        // true && true = true
+    }
+}
+```
+
+## Operator Usage Tips
+
+<AccordionGroup>
+  <Accordion title="Use Parentheses for Clarity">
+    Even when not required by precedence, parentheses improve readability:
+    ```expresiones
+    // Without parentheses (correct but less clear)
+    if (x > 5 && y < 10 || z == 0) { }
+    
+    // With parentheses (clearer intent)
+    if ((x > 5 && y < 10) || z == 0) { }
+    ```
+  </Accordion>
+  
+  <Accordion title="Avoid Complex Expressions">
+    Break down complex expressions into simpler steps:
+    ```expresiones
+    // Complex (harder to debug)
+    int result = (x + y * 2 - z / 3) * 4 + 5;
+    
+    // Simpler (easier to understand and debug)
+    int temp1 = y * 2;
+    int temp2 = z / 3;
+    int temp3 = x + temp1 - temp2;
+    int result = temp3 * 4 + 5;
+    ```
+  </Accordion>
+  
+  <Accordion title="Remember Precedence Rules">
+    Keep the precedence hierarchy in mind:
+    - Parentheses first
+    - `*` `/` before `+` `-`
+    - Arithmetic before relational
+    - Relational before logical
+    - `&&` before `||`
+  </Accordion>
+  
+  <Accordion title="Use Consistent Comparison Style">
+    Choose one style for not-equal and stick to it:
+    ```expresiones
+    // Choose either != or <>, not both
+    if (x != 0) { }   // Preferred
+    // or
+    if (x <> 0) { }   // Alternative
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Quick Reference
+
+### All Operators by Category
+
+**Arithmetic:**
+- `+` Addition
+- `-` Subtraction
+- `*` Multiplication
+- `/` Division
+
+**Relational:**
+- `>` Greater than
+- `<` Less than
+- `==` Equal to
+- `!=` or `<>` Not equal to
+- `>=` Greater than or equal
+- `<=` Less than or equal
+
+**Logical:**
+- `&&` AND (both conditions)
+- `||` OR (at least one condition)
+- `!` NOT (invert condition)

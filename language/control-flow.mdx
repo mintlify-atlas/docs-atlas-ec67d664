@@ -1,0 +1,359 @@
+---
+title: 'Control Flow'
+description: 'Learn how to control program execution flow with conditional statements'
+---
+
+## Overview
+
+Expresiones supports conditional execution through `if-else` statements, allowing your program to make decisions based on conditions.
+
+## If Statement
+
+The `if` statement executes a block of code when a condition is true:
+
+```expresiones
+if (condition) {
+    // Code to execute when condition is true
+}
+```
+
+### Basic If Example
+
+```expresiones
+program {
+    int x = 10;
+    
+    if (x > 5) {
+        x = x + 100;
+    }
+    // x is now 110
+}
+```
+
+## If-Else Statement
+
+The `else` clause provides an alternative block when the condition is false:
+
+```expresiones
+if (condition) {
+    // Code when condition is true
+} else {
+    // Code when condition is false
+}
+```
+
+### If-Else Example
+
+```expresiones
+program {
+    int valorUno = 5;
+    int valorDos = 10;
+    int resultado = valorUno + valorDos;
+    int exito;
+    int error;
+    
+    if (resultado > 10) {
+        exito = 1;
+    } else {
+        error = 0;
+    }
+}
+```
+
+<Note>
+The `else` clause is optional. You can use `if` without `else` when you don't need an alternative action.
+</Note>
+
+## Conditions
+
+Conditions are expressions that evaluate to true or false. Expresiones supports:
+
+- Relational operators
+- Logical operators
+- Parenthesized conditions
+
+### Relational Conditions
+
+Compare two expressions:
+
+```expresiones
+if (x > 10) { }          // Greater than
+if (x < 10) { }          // Less than
+if (x == 10) { }         // Equal to
+if (x != 10) { }         // Not equal to
+if (x >= 10) { }         // Greater than or equal
+if (x <= 10) { }         // Less than or equal
+```
+
+### Logical Conditions
+
+Combine multiple conditions:
+
+```expresiones
+program {
+    int x = 10;
+    bool activo = 1;
+    
+    // AND operator (&&)
+    if (x > 5 && activo == 1) {
+        x = x + 100;
+    }
+    
+    // OR operator (||)
+    if (x < 5 || activo == 1) {
+        x = x + 50;
+    }
+    
+    // NOT operator (!)
+    if (!(x > 100)) {
+        x = 0;
+    }
+}
+```
+
+<Info>
+Logical operators allow you to create complex conditions by combining simpler ones.
+</Info>
+
+## Nested If Statements
+
+You can nest `if` statements inside other `if` blocks:
+
+```expresiones
+program {
+    int x = 10;
+    int y = 5;
+    bool activo = 1;
+    int resultado = x + y * 2;
+    
+    if (resultado > 15 && activo == 1) {
+        // Outer if block
+        x = x + 100;
+        
+        // Nested if-else
+        if (x >= 110) {
+            y = y * y;  // 5 * 5 = 25
+        } else {
+            y = 0;
+        }
+    } else {
+        // Outer else block
+        resultado = 999;
+    }
+}
+```
+
+<Warning>
+Be careful with deeply nested conditions as they can make code harder to understand.
+</Warning>
+
+## Control Flow Grammar
+
+The formal grammar for control flow:
+
+```antlr
+instrucciones
+    : SI PAR_IZQ condicion PAR_DER bloque (SINO bloque)?
+
+bloque : LLAVE_IZQ instrucciones* LLAVE_DER
+
+condicion
+    : condicion O_LOGICO condicion           // OR (||)
+    | condicion Y_LOGICO condicion           // AND (&&)
+    | NO_LOGICO condicion                    // NOT (!)
+    | expr op expr                           // Relational
+    | PAR_IZQ condicion PAR_DER             // Parentheses
+```
+
+## Condition Operators
+
+### Logical Operators
+
+<CardGroup cols={3}>
+  <Card title="AND (&&)" icon="ampersand">
+    Both conditions must be true
+  </Card>
+  <Card title="OR (||)" icon="pipe">
+    At least one condition must be true
+  </Card>
+  <Card title="NOT (!)" icon="exclamation">
+    Inverts the condition
+  </Card>
+</CardGroup>
+
+### Logical Operator Examples
+
+```expresiones
+program {
+    int x = 10;
+    int y = 5;
+    
+    // AND: both must be true
+    if (x > 5 && y < 10) {
+        // Executes: x > 5 is true AND y < 10 is true
+    }
+    
+    // OR: at least one must be true
+    if (x < 5 || y < 10) {
+        // Executes: x < 5 is false BUT y < 10 is true
+    }
+    
+    // NOT: inverts the result
+    if (!(x < 5)) {
+        // Executes: x < 5 is false, ! makes it true
+    }
+}
+```
+
+### Relational Operators
+
+| Operator | Meaning | Example |
+|----------|---------|----------|
+| `>` | Greater than | `x > 10` |
+| `<` | Less than | `x < 10` |
+| `==` | Equal to | `x == 10` |
+| `!=` or `<>` | Not equal to | `x != 10` |
+| `>=` | Greater than or equal | `x >= 10` |
+| `<=` | Less than or equal | `x <= 10` |
+
+<Info>
+Expresiones supports both `!=` and `<>` for "not equal" comparison.
+</Info>
+
+## Complete Examples
+
+### Example 1: Simple Decision
+
+```expresiones
+program {
+    int valorUno = 5;
+    int valorDos = 10;
+    int resultado = valorUno + valorDos;
+    int exito;
+    int error;
+    
+    if (resultado > 10) {
+        exito = 1;
+    } else {
+        error = 0;
+    }
+}
+```
+
+### Example 2: Complex Conditions
+
+```expresiones
+program {
+    int x = 10;
+    int y = 5;
+    float pi = 3.14;
+    bool activo = 1;
+    int resultado = 0;
+    
+    // Arithmetic with precedence
+    resultado = x + y * 2;  // 20
+    
+    // Complex condition with AND
+    if (resultado > 15 && activo == 1) {
+        x = x + 100;
+        
+        // Nested conditional
+        if (x >= 110) {
+            y = y * y;  // 25
+        } else {
+            y = 0;
+        }
+    } else {
+        resultado = 999;
+    }
+    
+    // Use updated values
+    int calculoFinal = (x - 90 + y) / 5;
+    float area = pi * 10;
+}
+```
+
+### Example 3: Multiple Conditions
+
+```expresiones
+program {
+    int score = 85;
+    bool passed = 0;
+    bool failed = 0;
+    
+    // OR condition
+    if (score >= 90 || score >= 60 && score < 90) {
+        passed = 1;
+    } else {
+        failed = 1;
+    }
+}
+```
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Use Clear Conditions">
+    Write conditions that are easy to understand:
+    ```expresiones
+    // Good: Clear intent
+    if (resultado > 10) {
+        exito = 1;
+    }
+    
+    // Avoid: Complex nested logic without clear purpose
+    ```
+  </Accordion>
+  
+  <Accordion title="Group Related Logic">
+    Keep related operations together in the same block:
+    ```expresiones
+    if (activo == 1) {
+        x = x + 100;
+        y = y * 2;
+        resultado = x + y;
+    }
+    ```
+  </Accordion>
+  
+  <Accordion title="Use Parentheses for Clarity">
+    Add parentheses to complex conditions:
+    ```expresiones
+    // Clear grouping
+    if ((x > 5 && y < 10) || activo == 1) {
+        // ...
+    }
+    ```
+  </Accordion>
+  
+  <Accordion title="Limit Nesting Depth">
+    Avoid too many nested if statements:
+    ```expresiones
+    // Good: Two levels
+    if (resultado > 15) {
+        if (x >= 110) {
+            y = y * y;
+        }
+    }
+    
+    // Avoid: Too many levels become hard to read
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Control Flow Tips
+
+<Steps>
+  <Step title="Evaluate Conditions">
+    Understand what condition you're testing before writing the if statement
+  </Step>
+  <Step title="Consider Edge Cases">
+    Think about boundary values (e.g., what happens at exactly 10?)
+  </Step>
+  <Step title="Test Both Branches">
+    Ensure both the if and else blocks work correctly
+  </Step>
+  <Step title="Keep Blocks Focused">
+    Each block should have a clear, single purpose
+  </Step>
+</Steps>

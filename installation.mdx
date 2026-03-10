@@ -1,0 +1,125 @@
+---
+title: Installation
+description: Set up the Expresiones Language Compiler on your system
+---
+
+## Prerequisites
+
+The Expresiones compiler requires Python 3.6+ and ANTLR4 to be installed on your system.
+
+<Steps>
+  <Step title="Install ANTLR4">
+    Download and install ANTLR4 from the official website:
+
+    ```bash
+    cd /usr/local/lib
+    sudo curl -O https://www.antlr.org/download/antlr-4.13.1-complete.jar
+    ```
+
+    Add ANTLR to your CLASSPATH:
+
+    ```bash
+    export CLASSPATH=".:/usr/local/lib/antlr-4.13.1-complete.jar:$CLASSPATH"
+    alias antlr4='java -jar /usr/local/lib/antlr-4.13.1-complete.jar'
+    ```
+
+    <Note>
+      Add these lines to your `.bashrc` or `.zshrc` to make the changes permanent.
+    </Note>
+  </Step>
+
+  <Step title="Install Python Dependencies">
+    Install the ANTLR4 Python runtime:
+
+    ```bash
+    pip install antlr4-python3-runtime
+    ```
+
+    The compiler also uses tkinter for file selection dialogs. On most systems, tkinter comes pre-installed with Python. If you need to install it:
+
+    <CodeGroup>
+      ```bash Ubuntu/Debian
+      sudo apt-get install python3-tk
+      ```
+
+      ```bash Fedora
+      sudo dnf install python3-tkinter
+      ```
+
+      ```bash macOS
+      # Usually pre-installed with Python
+      # If needed, reinstall Python from python.org
+      brew install python-tk
+      ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="Generate Parser and Lexer">
+    Navigate to your source directory and generate the parser files from the grammar:
+
+    ```bash
+    cd workspace/source
+    antlr4 -Dlanguage=Python3 -visitor Expresiones.g
+    ```
+
+    This will generate the following files:
+    - `ExpresionesLexer.py`
+    - `ExpresionesParser.py`
+    - `ExpresionesVisitor.py`
+    - `Expresiones.tokens`
+
+    <Warning>
+      You must regenerate these files whenever you modify the grammar file (`Expresiones.g`).
+    </Warning>
+  </Step>
+
+  <Step title="Verify Installation">
+    Verify that all components are installed correctly:
+
+    ```bash
+    python -c "from antlr4 import *; print('ANTLR4 runtime OK')"
+    python -c "import tkinter; print('tkinter OK')"
+    ```
+
+    Both commands should execute without errors.
+  </Step>
+</Steps>
+
+## Project Structure
+
+Your workspace should have the following structure:
+
+```
+workspace/
+└── source/
+    ├── Expresiones.g          # Grammar definition
+    ├── Prueba.py              # Main compiler entry point
+    ├── Visitor.py             # Visitor implementation
+    ├── ExpresionesLexer.py    # Generated lexer
+    ├── ExpresionesParser.py   # Generated parser
+    └── ExpresionesVisitor.py  # Generated visitor base
+```
+
+## Troubleshooting
+
+<Warning>
+  If you encounter `ImportError: No module named antlr4`, make sure you've installed the correct runtime version that matches your ANTLR4 version.
+</Warning>
+
+### Common Issues
+
+**ANTLR4 not found**
+- Verify CLASSPATH is set correctly
+- Check that the ANTLR jar file exists at the specified path
+
+**Parser generation fails**
+- Ensure you're using ANTLR4 (not ANTLR3)
+- Check that the grammar file has no syntax errors
+
+**tkinter import error**
+- Install the python3-tk package for your distribution
+- On macOS, you may need to reinstall Python from python.org
+
+## Next Steps
+
+Now that you have everything installed, proceed to the [Quickstart](/quickstart) guide to compile your first Expresiones program.

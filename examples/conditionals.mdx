@@ -1,0 +1,329 @@
+---
+title: "Conditionals"
+description: "Master if-else statements, logical operators, and control flow in Expresiones"
+---
+
+## Overview
+
+Conditional statements allow your programs to make decisions based on boolean expressions. Expresiones supports `if-else` statements with logical operators for complex conditions.
+
+## Logical Operators
+
+| Operator | Description | Example |
+|----------|-------------|----------|
+| `==` | Equal to | `x == 5` |
+| `!=` | Not equal to | `x != 0` |
+| `>` | Greater than | `x > 10` |
+| `<` | Less than | `x < 20` |
+| `>=` | Greater than or equal | `x >= 15` |
+| `<=` | Less than or equal | `x <= 100` |
+| `&&` | Logical AND | `x > 0 && y < 10` |
+| `||` | Logical OR | `x == 1 || y == 2` |
+| `!` | Logical NOT | `!activo` |
+
+## Simple Conditional
+
+Here's a basic if-else statement:
+
+```expresiones
+program {
+    int valorUno; 
+    int valorDos; 
+    int resultado;
+    int exito; 
+    int error;
+
+    valorUno = 5; 
+    valorDos = 10; 
+    resultado = valorUno + valorDos;
+
+    if(resultado > 10){
+        exito = 1; 
+    } else {
+        error = 0; 
+    }
+}
+```
+
+### Expected Output
+
+```
+Condition evaluated: true
+exito = 1
+```
+
+### Symbol Table
+
+```
+┌─────────────┬──────────┬───────────┐
+│ Identifier  │ Type     │ Value     │
+├─────────────┼──────────┼───────────┤
+│ valorUno    │ int      │ 5         │
+│ valorDos    │ int      │ 10        │
+│ resultado   │ int      │ 15        │
+│ exito       │ int      │ 1         │
+│ error       │ int      │ (unset)   │
+└─────────────┴──────────┴───────────┘
+```
+
+<Steps>
+
+### Step 1: Calculate Result
+
+`resultado = valorUno + valorDos` evaluates to `15`.
+
+### Step 2: Evaluate Condition
+
+The condition `resultado > 10` is checked:
+- `15 > 10` evaluates to **true**
+
+### Step 3: Execute True Branch
+
+Since the condition is true, the `if` block executes:
+- `exito = 1` is assigned
+
+### Step 4: Skip Else Branch
+
+The `else` block is skipped, so `error` remains uninitialized.
+
+</Steps>
+
+## Compound Conditions with AND
+
+Use `&&` to require multiple conditions to be true:
+
+```expresiones
+program {
+    int x = 10;
+    int y = 5;
+    bool activo = 1;
+    int resultado;
+    
+    resultado = x + y * 2;  // 10 + 10 = 20
+    
+    if (resultado > 15 && activo == 1) {
+        x = x + 100;
+    } else {
+        resultado = 999;
+    }
+}
+```
+
+### Expected Output
+
+```
+Condition: 20 > 15 && 1 == 1
+Both conditions true - executing if block
+x = 110
+```
+
+<Steps>
+
+### Step 1: Evaluate First Condition
+
+`resultado > 15` → `20 > 15` → **true**
+
+### Step 2: Evaluate Second Condition
+
+`activo == 1` → `1 == 1` → **true**
+
+### Step 3: Combine with AND
+
+`true && true` → **true**
+
+### Step 4: Execute If Block
+
+`x = x + 100` → `x = 110`
+
+</Steps>
+
+## Compound Conditions with OR
+
+Use `||` when any condition can trigger the branch:
+
+```expresiones
+program {
+    int temperatura = 25;
+    int humedad = 80;
+    int alerta;
+    
+    if (temperatura > 30 || humedad > 75) {
+        alerta = 1;
+    } else {
+        alerta = 0;
+    }
+}
+```
+
+### Expected Output
+
+```
+Condition: 25 > 30 || 80 > 75
+Second condition true - executing if block
+alerta = 1
+```
+
+<Steps>
+
+### Step 1: Evaluate First Condition
+
+`temperatura > 30` → `25 > 30` → **false**
+
+### Step 2: Evaluate Second Condition
+
+`humedad > 75` → `80 > 75` → **true**
+
+### Step 3: Combine with OR
+
+`false || true` → **true**
+
+### Step 4: Execute If Block
+
+`alerta = 1`
+
+</Steps>
+
+## Nested Conditionals
+
+You can nest if-else statements for complex logic:
+
+```expresiones
+program {
+    int x = 110;
+    int y = 5;
+    
+    if (x >= 110) {
+        y = y * y;  // 5 * 5 = 25
+    } else {
+        y = 0;
+    }
+}
+```
+
+### Expected Output
+
+```
+Condition: 110 >= 110
+Condition true
+y = 25
+```
+
+<Steps>
+
+### Step 1: Evaluate Outer Condition
+
+`x >= 110` → `110 >= 110` → **true**
+
+### Step 2: Execute True Branch
+
+Calculate `y * y`:
+- `5 * 5 = 25`
+- Assign result to `y`
+
+### Step 3: Skip Else Branch
+
+The else branch (`y = 0`) is not executed.
+
+</Steps>
+
+## Boolean Variables
+
+Expresioes uses `1` for true and `0` for false:
+
+```expresiones
+program {
+    bool activo = 1;  // true
+    bool inactivo = 0;  // false
+    int resultado;
+    
+    if (activo == 1) {
+        resultado = 100;
+    }
+    
+    if (inactivo == 0) {
+        resultado = resultado + 50;
+    }
+}
+```
+
+### Expected Output
+
+```
+First condition: true
+Second condition: true
+resultado = 150
+```
+
+## Common Patterns
+
+<AccordionGroup>
+
+<Accordion title="Range Checking">
+Check if a value falls within a range:
+```expresiones
+if (x >= 0 && x <= 100) {
+    // x is between 0 and 100
+}
+```
+</Accordion>
+
+<Accordion title="Equality vs Assignment">
+Remember to use `==` for comparison, not `=`:
+```expresiones
+// Wrong - this is assignment!
+if (x = 5) { }
+
+// Correct - this is comparison
+if (x == 5) { }
+```
+</Accordion>
+
+<Accordion title="Default Values with Else">
+Use else to handle all other cases:
+```expresiones
+if (condicion) {
+    resultado = 1;
+} else {
+    resultado = 0;  // Default case
+}
+```
+</Accordion>
+
+<Accordion title="Multiple Conditions">
+Combine multiple logical operators:
+```expresiones
+if ((x > 0 && x < 10) || y == 100) {
+    // Complex condition
+}
+```
+</Accordion>
+
+</AccordionGroup>
+
+## Best Practices
+
+<Warning>
+Be careful with nested conditions - too many levels can make code hard to understand. Consider refactoring complex logic into simpler conditions.
+</Warning>
+
+<Tip>
+Use parentheses to make complex conditions more readable:
+```expresiones
+// Less readable
+if (a > 5 && b < 10 || c == 0) { }
+
+// More readable
+if ((a > 5 && b < 10) || c == 0) { }
+```
+</Tip>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Basic Arithmetic" icon="calculator" href="/examples/basic-arithmetic">
+    Review arithmetic operations and expressions
+  </Card>
+  <Card title="Complex Programs" icon="diagram-project" href="/examples/complex-programs">
+    See how arithmetic and conditionals work together
+  </Card>
+</CardGroup>

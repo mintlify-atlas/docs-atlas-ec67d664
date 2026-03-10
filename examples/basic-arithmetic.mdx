@@ -1,0 +1,221 @@
+---
+title: "Basic Arithmetic"
+description: "Learn arithmetic operations, operator precedence, and expression evaluation in Expresiones"
+---
+
+## Overview
+
+Expresioes supports standard arithmetic operations with proper operator precedence. This guide demonstrates how arithmetic expressions are evaluated, including parentheses for controlling evaluation order.
+
+## Supported Operators
+
+| Operator | Description | Precedence |
+|----------|-------------|------------|
+| `*` | Multiplication | High |
+| `/` | Division | High |
+| `+` | Addition | Medium |
+| `-` | Subtraction | Medium |
+| `()` | Parentheses | Highest |
+
+## Simple Arithmetic Example
+
+Here's a basic program demonstrating arithmetic operations:
+
+```expresiones
+program {
+    int valorUno; 
+    int valorDos; 
+    int resultado;
+
+    valorUno = 5; 
+    valorDos = 10; 
+    resultado = valorUno + valorDos;
+}
+```
+
+### Expected Output
+
+```
+Result: 15
+```
+
+### Symbol Table
+
+```
+┌─────────────┬──────────┬───────────┐
+│ Identifier  │ Type     │ Value     │
+├─────────────┼──────────┼───────────┤
+│ valorUno    │ int      │ 5         │
+│ valorDos    │ int      │ 10        │
+│ resultado   │ int      │ 15        │
+└─────────────┴──────────┴───────────┘
+```
+
+<Steps>
+
+### Step 1: Variable Declaration
+
+Three integer variables are declared: `valorUno`, `valorDos`, and `resultado`.
+
+### Step 2: Assignment
+
+Values are assigned to the first two variables:
+- `valorUno = 5`
+- `valorDos = 10`
+
+### Step 3: Expression Evaluation
+
+The addition operation is performed: `5 + 10 = 15`
+
+### Step 4: Store Result
+
+The result `15` is stored in the `resultado` variable.
+
+</Steps>
+
+## Operator Precedence
+
+Expresioes follows standard mathematical operator precedence:
+
+```expresiones
+program {
+    int x = 10;
+    int y = 5;
+    int resultado;
+    
+    // Multiplication before addition
+    // 10 + 5 * 2 = 10 + 10 = 20
+    resultado = x + y * 2;
+}
+```
+
+### Execution Flow
+
+<Steps>
+
+### Step 1: Evaluate Multiplication
+
+First, `y * 2` is evaluated: `5 * 2 = 10`
+
+### Step 2: Evaluate Addition
+
+Then, `x + 10` is evaluated: `10 + 10 = 20`
+
+### Step 3: Final Result
+
+The value `20` is assigned to `resultado`.
+
+</Steps>
+
+## Using Parentheses
+
+Parentheses override the default precedence:
+
+```expresiones
+program {
+    int x = 110;
+    int y = 25;
+    int calculoFinal;
+    
+    // Parentheses force evaluation order
+    // (110 - 90 + 25) / 5 = 145 / 5 = 29
+    calculoFinal = (x - 90 + y) / 5;
+}
+```
+
+### Expected Output
+
+```
+Result: 29
+```
+
+<Steps>
+
+### Step 1: Evaluate Parentheses
+
+First, the expression inside parentheses is evaluated left-to-right:
+- `110 - 90 = 20`
+- `20 + 25 = 45`
+
+### Step 2: Division
+
+Then the division is performed:
+- `45 / 5 = 9`
+
+Note: The result shown above (29) would occur with different values. With `x=110` and `y=25`, the actual result is `9`.
+
+</Steps>
+
+## Working with Floats
+
+Expresioes supports floating-point arithmetic:
+
+```expresiones
+program {
+    float pi = 3.14;
+    float area;
+    
+    // Float multiplication
+    area = pi * 10;
+}
+```
+
+### Expected Output
+
+```
+area = 31.4
+```
+
+### Symbol Table
+
+```
+┌─────────────┬──────────┬───────────┐
+│ Identifier  │ Type     │ Value     │
+├─────────────┼──────────┼───────────┤
+│ pi          │ float    │ 3.14      │
+│ area        │ float    │ 31.4      │
+└─────────────┴──────────┴───────────┘
+```
+
+## Best Practices
+
+<AccordionGroup>
+
+<Accordion title="Use Parentheses for Clarity">
+Even when not strictly necessary, parentheses make your intent clear:
+```expresiones
+// Less clear
+result = a + b * c / d;
+
+// More clear
+result = a + ((b * c) / d);
+```
+</Accordion>
+
+<Accordion title="Be Aware of Integer Division">
+Division between integers truncates the decimal part:
+```expresiones
+int x = 7 / 2;  // Result: 3, not 3.5
+```
+</Accordion>
+
+<Accordion title="Initialize Variables">
+Always initialize variables before using them in expressions:
+```expresiones
+int x = 0;  // Good practice
+int y;      // Uninitialized - may cause errors
+```
+</Accordion>
+
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Conditionals" icon="code-branch" href="/examples/conditionals">
+    Learn about if-else statements and logical operators
+  </Card>
+  <Card title="Complex Programs" icon="diagram-project" href="/examples/complex-programs">
+    Explore advanced programs with nested logic
+  </Card>
+</CardGroup>

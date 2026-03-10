@@ -1,0 +1,292 @@
+---
+title: Grammar Structure
+description: Understanding and modifying the ANTLR4 grammar for the Expresiones compiler
+---
+
+## Overview
+
+The Expresiones language grammar is defined in `Expresiones.g` using ANTLR4 syntax. This grammar specifies both the syntactic structure (parser rules) and lexical tokens (lexer rules) of the language.
+
+## Grammar File Structure
+
+The grammar file is organized into two main sections:
+
+1. **Syntactic Rules** - Define the structure of valid programs
+2. **Lexical Rules** - Define tokens (keywords, operators, identifiers)
+
+### Root Rule
+
+Every Expresiones program starts with the `root` rule:
+
+```antlr
+root : PROGRAMA LLAVE_IZQ instrucciones+ LLAVE_DER EOF # Prog ;
+```
+
+This requires:
+- The keyword `program`
+- Opening brace `{`
+- One or more instructions
+- Closing brace `}`
+- End of file
+
+<Tip>
+The `# Prog` label creates a specific visitor method `visitProg()` that you can override in your visitor implementation.
+</Tip>
+
+## Syntactic Rules
+
+### Instructions
+
+The `instrucciones` rule defines three types of statements:
+
+```antlr
+instrucciones
+    : declaracion PUNTO_COMA                 #InstrDecl
+    | asignacion PUNTO_COMA                  #InstrAsig
+    | SI PAR_IZQ condicion PAR_DER bloque (SINO bloque)? #InstrIf
+    ;
+```
+
+Each alternative has a label (`#InstrDecl`, `#InstrAsig`, `#InstrIf`) that generates separate visitor methods.
+
+### Declarations
+
+```antlr
+declaracion : TIPO ID (ASIGNACION expr)? ;
+```
+
+Supports:
+- Type specification (int, float, bool)
+- Variable name
+- Optional initialization with an expression
+
+**Example:**
+```
+int x;
+float y = 3.14;
+```
+
+### Assignments
+
+```antlr
+asignacion : ID ASIGNACION expr ;
+```
+
+Simple assignment of an expression to an existing variable.
+
+### Expressions
+
+Expressions support arithmetic operations with proper precedence:
+
+```antlr
+expr: expr (MULT | DIV) expr                #Aritmetica
+    | expr (SUMA | RESTA) expr              #Aritmetica
+    | NUMERO                                #Numero
+    | ID                                    #Variable
+    | PAR_IZQ expr PAR_DER                  #ParentesisExpr
+    ;
+```
+
+<Warning>
+The order of alternatives in `expr` determines operator precedence. Multiplication and division bind tighter than addition and subtraction due to appearing first.
+</Warning>
+
+### Conditions
+
+Boolean expressions for control flow:
+
+```antlr
+condicion
+    : condicion O_LOGICO condicion          #Logica
+    | condicion Y_LOGICO condicion          #Logica
+    | NO_LOGICO condicion                   #NotLogica
+    | expr op=(MAYOR | MENOR | IGUAL | MAYOR_IGUAL | MENOR_IGUAL | DIFERENTE) expr #Relacional
+    | PAR_IZQ condicion PAR_DER             #ParentesisCond
+    ;
+```
+
+Supports:
+- Logical operators: `&&` (AND), `||` (OR), `!` (NOT)
+- Comparison operators: `>`, `<`, `==`, `!=`, `<>`, `>=`, `<=`
+- Parenthesized conditions
+
+## Lexical Rules
+
+### Keywords
+
+```antlr
+PROGRAMA : 'program' ;
+SI       : 'if' ;
+SINO     : 'else' ;
+TIPO     : 'int' | 'float' | 'bool' ;
+```
+
+### Operators
+
+**Arithmetic:**
+```antlr
+SUMA  : '+' ;
+RESTA : '-' ;
+MULT  : '*' ;
+DIV   : '/' ;
+```
+
+**Comparison:**
+```antlr
+MAYOR       : '>' ;
+MENOR       : '<' ;
+IGUAL       : '==' ;
+DIFERENTE   : '!=' | '<>' ;
+MAYOR_IGUAL : '>=' ;
+MENOR_IGUAL : '<=' ;
+```
+
+**Logical:**
+```antlr
+Y_LOGICO  : '&&' ;
+O_LOGICO  : '||' ;
+NO_LOGICO : '!' ;
+```
+
+### Identifiers and Literals
+
+```antlr
+ID     : [a-zA-Z][a-zA-Z0-9]* ;
+NUMERO : [0-9]+ ('.' [0-9]+)? ;
+```
+
+- **ID**: Must start with a letter, followed by letters or digits
+- **NUMERO**: Integers or decimals (3.14, 42)
+
+### Whitespace and Comments
+
+```antlr
+WS     : [ \t\r\n]+ -> skip ;
+COMENTARIO : '//' ~[\n\r]* -> skip ;
+```
+
+Spaces, tabs, newlines, and single-line comments are ignored.
+
+## Modifying the Grammar
+
+<Steps>
+
+### Step 1: Add Lexical Tokens
+
+If adding new keywords or operators, define them in the lexical section:
+
+```antlr
+WHILE : 'while' ;
+DO    : 'do' ;
+```
+
+### Step 2: Update Syntactic Rules
+
+Add new rule alternatives or create new rules:
+
+```antlr
+instrucciones
+    : declaracion PUNTO_COMA                 #InstrDecl
+    | asignacion PUNTO_COMA                  #InstrAsig
+    | SI PAR_IZQ condicion PAR_DER bloque (SINO bloque)? #InstrIf
+    | WHILE PAR_IZQ condicion PAR_DER bloque #InstrWhile
+    ;
+```
+
+### Step 3: Regenerate Parser
+
+After modifying the grammar, regenerate the parser and lexer:
+
+```bash
+antlr4 -Dlanguage=Python3 -visitor Expresiones.g
+```
+
+This creates:
+- `ExpresionesLexer.py`
+- `ExpresionesParser.py`
+- `ExpresionesVisitor.py`
+
+### Step 4: Update Visitor
+
+Implement visitor methods for new labeled rules (see [Extending the Compiler](/development/extending)).
+
+</Steps>
+
+## Common Grammar Patterns
+
+### Adding a New Operator
+
+<Steps>
+
+1. Define the token:
+   ```antlr
+   MODULO : '%' ;
+   ```
+
+2. Add to expression rule:
+   ```antlr
+   expr: expr (MULT | DIV | MODULO) expr    #Aritmetica
+       | expr (SUMA | RESTA) expr          #Aritmetica
+       ...
+   ```
+
+3. Handle in visitor:
+   ```python
+   if op == ExpresionesParser.MODULO: return izq % der
+   ```
+
+</Steps>
+
+### Adding a New Statement Type
+
+<Steps>
+
+1. Define required tokens:
+   ```antlr
+   PRINT : 'print' ;
+   ```
+
+2. Create the rule:
+   ```antlr
+   instrucciones
+       : ...
+       | PRINT PAR_IZQ expr PAR_DER PUNTO_COMA #InstrPrint
+       ;
+   ```
+
+3. Implement `visitInstrPrint()` in your visitor
+
+</Steps>
+
+### Adding a New Data Type
+
+```antlr
+TIPO : 'int' | 'float' | 'bool' | 'string' ;
+```
+
+<Tip>
+You'll also need to add string literals to the lexical rules and update your visitor's type checking logic.
+</Tip>
+
+## Best Practices
+
+1. **Use Labels**: Always add `#Label` to rule alternatives to generate specific visitor methods
+2. **Order Matters**: Put more specific tokens before general ones to avoid matching conflicts
+3. **Left Recursion**: ANTLR4 handles left recursion automatically - use it for left-associative operators
+4. **Test Incrementally**: After each grammar change, test with simple programs before adding complexity
+
+<Warning>
+Always regenerate the parser after modifying the grammar. The old parser files won't reflect your changes.
+</Warning>
+
+## Grammar Debugging Tips
+
+- **Use grun**: ANTLR provides a test rig to visualize parse trees
+- **Check Ambiguity**: ANTLR will warn about ambiguous rules
+- **Validate Tokens**: Ensure lexer tokens don't overlap unexpectedly
+- **Test Edge Cases**: Empty programs, nested structures, operator precedence
+
+## Next Steps
+
+- Learn how to [extend the compiler](/development/extending) with new visitor methods
+- Understand [testing strategies](/development/testing) for validating grammar changes

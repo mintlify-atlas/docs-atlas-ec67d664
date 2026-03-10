@@ -1,0 +1,170 @@
+---
+title: 'Syntax'
+description: 'Learn the fundamental syntax rules of the Expresiones programming language'
+---
+
+## Program Structure
+
+Every Expresiones program must begin with the `program` keyword followed by a block enclosed in curly braces:
+
+```expresiones
+program {
+    // Your code here
+}
+```
+
+<Note>
+The `program` keyword is required and marks the entry point of your code.
+</Note>
+
+## Basic Program Example
+
+Here's a minimal valid Expresiones program:
+
+```expresiones
+program {
+    int x = 10;
+    int y = 5;
+    int resultado = x + y;
+}
+```
+
+## Statements
+
+Expresiones supports three types of statements:
+
+### 1. Variable Declarations
+
+Declare variables with a type, identifier, and optional initialization:
+
+```expresiones
+int x;              // Declaration without initialization
+float pi = 3.14;    // Declaration with initialization
+bool activo = 1;    // Boolean declaration
+```
+
+<Info>
+All declarations must end with a semicolon (`;`).
+</Info>
+
+### 2. Assignments
+
+Assign values to previously declared variables:
+
+```expresiones
+x = 20;
+pi = 3.14159;
+resultado = x + y * 2;
+```
+
+### 3. Control Flow Statements
+
+Conditional statements allow branching logic:
+
+```expresiones
+if (x > 10) {
+    y = 100;
+}
+
+if (resultado > 15 && activo == 1) {
+    x = x + 100;
+} else {
+    resultado = 999;
+}
+```
+
+## Code Blocks
+
+Blocks are enclosed in curly braces `{}` and can contain zero or more statements:
+
+```expresiones
+{
+    int a = 5;
+    int b = 10;
+    int sum = a + b;
+}
+```
+
+## Comments
+
+Expresiones supports single-line comments using `//`:
+
+```expresiones
+// This is a comment
+int x = 10;  // Inline comment
+
+// Multiple comment lines
+// can be written like this
+```
+
+<Warning>
+Multi-line comments (`/* */`) are not supported in Expresiones.
+</Warning>
+
+## Identifiers
+
+Identifiers (variable names) must follow these rules:
+
+- Start with a letter (a-z or A-Z)
+- Can contain letters, digits (0-9)
+- Cannot start with a digit
+- Case-sensitive
+
+**Valid identifiers:**
+```expresiones
+x
+valorUno
+resultado
+calculoFinal
+activo
+```
+
+**Invalid identifiers:**
+```expresiones
+1variable  // Cannot start with digit
+x-value    // Cannot contain hyphens
+```
+
+## Complete Program Example
+
+```expresiones
+program {
+    // Variable declarations
+    int valorUno; 
+    int valorDos; 
+    int resultado;
+    int exito; 
+    int error;
+
+    // Assignments
+    valorUno = 5; 
+    valorDos = 10; 
+    resultado = valorUno + valorDos;
+
+    // Control flow
+    if (resultado > 10) {
+        exito = 1; 
+    } else {
+        error = 0; 
+    }
+}
+```
+
+## Grammar Reference
+
+The formal grammar structure:
+
+```antlr
+root : PROGRAMA LLAVE_IZQ instrucciones+ LLAVE_DER EOF
+
+instrucciones
+    : declaracion PUNTO_COMA
+    | asignacion PUNTO_COMA
+    | SI PAR_IZQ condicion PAR_DER bloque (SINO bloque)?
+
+bloque : LLAVE_IZQ instrucciones* LLAVE_DER
+
+declaracion : TIPO ID (ASIGNACION expr)?
+
+asignacion : ID ASIGNACION expr
+```
